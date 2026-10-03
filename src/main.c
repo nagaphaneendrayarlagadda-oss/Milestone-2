@@ -10,6 +10,7 @@
 #include "parser.h"
 #include "expand.h"
 #include "builtin.h"
+#include "executor.h"
 
 int main(void)
 {
@@ -22,7 +23,6 @@ int main(void)
 
     token_list_t tokens;
     pipeline_t pipeline;
-
     char *line;
 
     while (1)
@@ -59,17 +59,14 @@ int main(void)
 
         if (pipeline.command_count == 1 &&
             pipeline.commands[0].argc > 0 &&
-            is_builtin(&pipeline.commands[0]))
+            strcmp(pipeline.commands[0].argv[0], "exit") == 0)
         {
-            if (strcmp(pipeline.commands[0].argv[0], "exit") == 0)
-            {
-                free(line);
-                printf("Exiting...\n");
-                break;
-            }
-
-            execute_builtin(&pipeline.commands[0]);
+            free(line);
+            printf("Exiting...\n");
+            break;
         }
+
+        execute_command(&pipeline.commands[0]);
 
         free(line);
     }
